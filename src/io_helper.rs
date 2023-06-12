@@ -4,7 +4,7 @@ use std::io::{self, Error, BufWriter, prelude::*};
 use zip::{ZipArchive, ZipWriter, write::FileOptions};
 
 pub fn data_dir() -> PathBuf {
-  let path: PathBuf = directories::BaseDirs::new().unwrap().config_dir().join(env!("CARGO_PKG_NAME"));
+  let path: PathBuf = dirs::data_dir().unwrap().join(env!("CARGO_PKG_NAME"));
   make_new_directory(&path);
   return path;
 }
