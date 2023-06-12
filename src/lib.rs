@@ -3,6 +3,7 @@ pub fn add(left: usize, right: usize) -> usize {
 }
 
 mod io_helper;
+mod meta_structure;
 
 #[cfg(test)]
 mod tests {
