@@ -4,6 +4,7 @@ pub fn add(left: usize, right: usize) -> usize {
 
 mod io_helper;
 mod meta_structure;
+mod json_handler;
 
 #[cfg(test)]
 mod tests {
