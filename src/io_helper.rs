@@ -69,39 +69,34 @@ pub fn file_count_in_directory(path: &PathBuf) -> i32 {
   return count;
 }
 
-pub fn generate_archive(file1_path: &PathBuf, file2_path: &PathBuf, file3_path: &PathBuf, output_file: &PathBuf) -> zip::result::ZipResult<()> {
+pub fn generate_archive(file_paths: &Vec<PathBuf>, output_file: &PathBuf) -> zip::result::ZipResult<()> {
   let file: File = fs::File::create(output_file)?;
   let mut zip: ZipWriter<BufWriter<File>> = ZipWriter::new(BufWriter::new(file));
-
+  
   // Compression method: Stored (No compression)
   let options: FileOptions = FileOptions::default().compression_method(zip::CompressionMethod::Stored);
   
-  // Add the first file to the archive
-  zip.start_file(file1_path.file_name().and_then(|os_str: &std::ffi::OsStr| os_str.to_str()).unwrap(), options)?;
-  let mut file1: File = fs::File::open(file1_path)?;
-  let mut buffer: Vec<u8> = Vec::new();
-  file1.read_to_end(&mut buffer)?;
-  zip.write_all(&buffer)?;
-  
-  // Add the second file to the archive
-  zip.start_file(file2_path.file_name().and_then(|os_str: &std::ffi::OsStr| os_str.to_str()).unwrap(), options)?;
-  let mut file2: File = fs::File::open(file2_path)?;
-  let mut buffer: Vec<u8> = Vec::new();
-  file2.read_to_end(&mut buffer)?;
-  zip.write_all(&buffer)?;
-  
-  // Add the third file to the archive
-  zip.start_file(file3_path.file_name().and_then(|os_str: &std::ffi::OsStr| os_str.to_str()).unwrap(), options)?;
-  let mut file3: File = fs::File::open(file3_path)?;
-  let mut buffer: Vec<u8> = Vec::new();
-  file3.read_to_end(&mut buffer)?;
-  zip.write_all(&buffer)?;
+  // Loops through all files to be added to archive.
+  for file in file_paths.iter() {
+    zip.start_file(
+            // Gets the file name itself for use in archive.
+      file
+              .file_name()
+              .and_then(|os_str: &std::ffi::OsStr | os_str.to_str())
+              .unwrap(),
+      options
+    )?;
+    let mut file1: File = fs::File::open(file)?;
+    let mut buffer: Vec<u8> = Vec::new();
+    file1.read_to_end(&mut buffer)?;
+    zip.write_all(&buffer)?;
+    
+    // Deletes the original file.
+    delete_file(file);
+  }
   
   // Finishing up
   zip.finish()?;
-  delete_file(file1_path);
-  delete_file(file2_path);
-  delete_file(file3_path);
   Ok(())
 }
 
